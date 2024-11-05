@@ -1,10 +1,12 @@
-# FROM nvidia/cuda:10.1-devel-ubuntu18.04
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+# Use the latest CUDA base image with cuDNN
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
+# Set noninteractive mode for apt-get
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends tzdata
+# Install system dependencies (include git)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     wget \
     curl \
     make \
@@ -22,31 +24,49 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     liblzma-dev \
     vim \
-    graphviz
+    graphviz \
+    && rm -rf /var/lib/apt/lists/*
 
+# Set timezone
 ENV TZ Asia/Tokyo
 
-WORKDIR /root/
-RUN wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tar.xz \
-    && tar xvf Python-3.8.5.tar.xz \
-    && cd Python-3.8.5 \
+# Set the working directory
+WORKDIR /app
+
+# Clone the specified GitHub repository
+RUN git clone https://github.com/kyk-131/Human-Activity.git
+
+# Change to the cloned repository's directory
+WORKDIR /app/Human-Activity
+
+# Install Python (latest version as of now is 3.11.x)
+RUN wget https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz \
+    && tar xvf Python-3.11.4.tgz \
+    && cd Python-3.11.4 \
     && ./configure --enable-optimizations \
-    && make install
-RUN rm Python-3.8.5.tar.xz
+    && make install \
+    && cd .. \
+    && rm -rf Python-3.11.4.tgz Python-3.11.4
 
-WORKDIR /root/Python-3.8.5
-RUN ln -fs /root/Python-3.8.5/python /usr/bin/python
-RUN curl -kL https://bootstrap.pypa.io/get-pip.py | python 
-RUN rm -rf /var/lib/apt/lists/*
+# Create a symbolic link for python
+RUN ln -fs /usr/local/bin/python3 /usr/bin/python
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+# Install pip
+RUN curl -kL https://bootstrap.pypa.io/get-pip.py | python
+
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python -
 ENV SHELL /bin/bash -l
 
+# Set Poetry and pip cache directories
 ENV POETRY_CACHE /work/.cache/poetry
 ENV PIP_CACHE_DIR /work/.cache/pip
 
-RUN $HOME/.poetry/bin/poetry config virtualenvs.path $POETRY_CACHE
+# Configure Poetry to use the cache directory
+RUN /root/.local/bin/poetry config virtualenvs.path $POETRY_CACHE
 
-ENV PATH ${PATH}:/root/.poetry/bin:/bin:/usr/local/bin:/usr/bin
+# Update PATH to include Poetry
+ENV PATH ${PATH}:/root/.local/bin:/bin:/usr/local/bin:/usr/bin
 
+# Default command
 CMD ["bash", "-l"]
