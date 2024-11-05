@@ -18,11 +18,19 @@ ENV POETRY_HOME="/root/.local"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # Create a cache directory for Poetry
-RUN mkdir -p /work/.cache/poetry && \
-    poetry config virtualenvs.path /work/.cache/poetry
+RUN mkdir -p /work/.cache/poetry
+
+# Configure Poetry to use the cache directory for virtual environments
+RUN poetry config virtualenvs.path /work/.cache/poetry
 
 # Clone the specified GitHub repository
 RUN git clone https://github.com/kyk-131/Human-Activity.git /work/Human-Activity
+
+# Change working directory to the cloned repository
+WORKDIR /work/Human-Activity
+
+# Install the project dependencies with Poetry
+RUN poetry install
 
 # Start the container with a bash shell
 CMD ["bash", "-l"]
