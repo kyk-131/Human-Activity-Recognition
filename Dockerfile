@@ -1,15 +1,28 @@
-FROM python:3.8.5-buster
+# Use the latest stable version of Python
+FROM python:3.11-slim
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-ENV SHELL /bin/bash -l
+# Set the timezone
+ENV TZ=Asia/Tokyo
 
-ENV TZ Asia/Tokyo
+# Install curl and other required packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV POETRY_CACHE /work/.cache/poetry
-ENV PIP_CACHE_DIR /work/.cache/pip
+# Install Poetry using the recommended installation script
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-RUN $HOME/.poetry/bin/poetry config virtualenvs.path $POETRY_CACHE
+# Set the Poetry environment variables
+ENV POETRY_HOME="/root/.local/share/pypoetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
 
-ENV PATH ${PATH}:/root/.poetry/bin:/bin:/usr/local/bin:/usr/bin
+# Configure Poetry to use a cache directory
+ENV POETRY_CACHE="/work/.cache/poetry"
+ENV PIP_CACHE_DIR="/work/.cache/pip"
 
+# Create a cache directory for Poetry
+RUN mkdir -p $POETRY_CACHE && \
+    poetry config virtualenvs.path $POETRY_CACHE
+
+# Start the container with a bash shell
 CMD ["bash", "-l"]
