@@ -20,11 +20,11 @@ ENV PATH="/root/.local/bin:$PATH"
 # Create a cache directory for Poetry
 RUN mkdir -p /work/.cache/poetry
 
-# Clone the specified GitHub repository
-RUN git clone https://github.com/kyk-131/Human-Activity.git /work/Human-Activity
+# Clone the specified GitHub repository for Human-Activity-Recognition
+RUN git clone https://github.com/kyk-131/Human-Activity-Recognition.git
 
 # Change working directory to the cloned repository
-WORKDIR /work/Human-Activity
+WORKDIR /work/Human-Activity-Recognition
 
 # Install the project dependencies with Poetry
 RUN poetry config virtualenvs.in-project true && \
