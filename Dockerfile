@@ -21,7 +21,8 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN mkdir -p /work/.cache/poetry
 
 # Configure Poetry to use the cache directory for virtual environments
-RUN poetry config virtualenvs.path /work/.cache/poetry
+# We do this in the next RUN command to ensure that Poetry is available
+RUN /root/.local/bin/poetry config virtualenvs.path /work/.cache/poetry
 
 # Clone the specified GitHub repository
 RUN git clone https://github.com/kyk-131/Human-Activity.git /work/Human-Activity
