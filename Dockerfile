@@ -21,7 +21,7 @@ ENV PATH="/root/.local/bin:$PATH"
 RUN mkdir -p /work/.cache/poetry
 
 # Clone the specified GitHub repository for Human-Activity-Recognition
-RUN git clone https://github.com/kyk-131/Human-Activity-Recognition.git
+RUN git clone https://github.com/kyk-131/Human-Activity-Recognition.git /work/Human-Activity-Recognition
 
 # Change working directory to the cloned repository
 WORKDIR /work/Human-Activity-Recognition
