@@ -55,8 +55,11 @@ RUN ln -fs /usr/local/bin/python3 /usr/bin/python
 RUN curl -kL https://bootstrap.pypa.io/get-pip.py | python
 
 # Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python -
-ENV SHELL /bin/bash -l
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Ensure poetry is added to the PATH
+ENV PATH="/root/.local/bin:$PATH"
+
 
 # Set Poetry and pip cache directories
 ENV POETRY_CACHE /work/.cache/poetry
